@@ -5,7 +5,7 @@ import sys
 import os
 import stat
 import time
-from play import generate_play_command, create_control_file, remove_control_file, play, get, set, command
+from play import generate_play_command, create_control_file, remove_control_file, play, get, set, command, socketfile
 from mpv import mpv_control
 
 class TestPlayInterface(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestPlayInterface(unittest.TestCase):
       '--mute=no',
       '--alang=jpn',
       '--idle=no',
-      '--input-unix-socket', '/tmp/mpv_control',
+      '--input-unix-socket', socketfile,
       sys.argv[0]
     ]
 
@@ -47,23 +47,23 @@ class TestPlayInterface(unittest.TestCase):
     # Remove existing file
     remove_control_file()
     with self.assertRaises(FileNotFoundError):
-      stat.S_ISFIFO(os.stat('/tmp/mpv_control').st_mode)
+      stat.S_ISFIFO(os.stat(socketfile).st_mode)
 
     # Create new file
     create_control_file()
-    self.assertEqual(stat.S_ISFIFO(os.stat('/tmp/mpv_control').st_mode), True)
+    self.assertEqual(stat.S_ISFIFO(os.stat(socketfile).st_mode), True)
 
     # Remove it again
     remove_control_file()
     with self.assertRaises(FileNotFoundError):
-      stat.S_ISFIFO(os.stat('/tmp/mpv_control').st_mode)
+      stat.S_ISFIFO(os.stat(socketfile).st_mode)
 
   def test_command_should_fail_if_fifo_file_is_absent(self):
     remove_control_file()
     mpv = mpv_control()
 
     with self.assertRaises(FileNotFoundError):
-      mpv.setup_socket('/tmp/mpv_control')
+      mpv.setup_socket(socketfile)
 
     mpv.teardown_socket()
 
