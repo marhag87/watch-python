@@ -4,7 +4,9 @@ import unittest
 import sys
 import os
 import stat
-from play import generate_play_command, create_control_file, remove_control_file, control
+import time
+from play import generate_play_command, create_control_file, remove_control_file, play, get, set, command
+from mpv import mpv_control
 
 class TestPlayInterface(unittest.TestCase):
 
@@ -15,11 +17,22 @@ class TestPlayInterface(unittest.TestCase):
       '-x11-name', 'tv',
       '--mute=no',
       '--alang=jpn',
-      '--input-file', '/tmp/mpv_control',
+      '--idle=no',
+      '--input-unix-socket', '/tmp/mpv_control',
       sys.argv[0]
     ]
 
     self.assertEqual(sane_command, play_command)
+
+  def test_should_be_able_to_start_mpv_in_idle_mode(self):
+    play_command = generate_play_command(sys.argv[0], idle=True)
+
+    self.assertIn('--idle=yes', play_command)
+
+  def test_should_be_able_to_start_mpv_in_mute_mode(self):
+    play_command = generate_play_command(sys.argv[0], mute=True)
+
+    self.assertIn('--mute=yes', play_command)
 
   def test_should_check_that_file_exists(self):
     play_command1 = generate_play_command(sys.argv[0])
@@ -47,22 +60,27 @@ class TestPlayInterface(unittest.TestCase):
 
   def test_command_should_fail_if_fifo_file_is_absent(self):
     remove_control_file()
+    mpv = mpv_control()
+
     with self.assertRaises(FileNotFoundError):
-      control('wat')
+      mpv.setup_socket('/tmp/mpv_control')
+
+    mpv.teardown_socket()
 
   def test_can_send_commands_through_fifo(self):
-    remove_control_file()
-    create_control_file()
-    pid = os.fork()
-    if pid:
-      fifo = open('/tmp/mpv_control', 'r')
-      result = fifo.read()
-      fifo.close()
-      self.assertEqual('wat\n', result)
-    else:
-      control('wat')
-      # Use os instead of sys. This skips cleanups but doesn't raise errors
-      os._exit(0)
+    play('https://www.youtube.com/watch?v=B1WiYtAfNoQ', mute=True)
+    time.sleep(2)
+
+    pause = get('pause')
+    self.assertEqual(pause, False)
+
+    set('pause', True)
+    pause = get('pause')
+    self.assertEqual(pause, True)
+
+    command('quit')
+    with self.assertRaises(ConnectionRefusedError):
+      get('pause')
 
   def test_should_be_able_to_play_http_content(self):
     play_command = generate_play_command('https://www.youtube.com/watch?v=5u3iv8AT8G8')
