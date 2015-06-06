@@ -8,6 +8,14 @@ from control_spotify import control_spotify
 from mpv import mpv_control
 
 socketfile = '/tmp/mpv_control'
+help = 'Usage:\n' + \
+       sys.argv[0] + ' <filename|web link>\n' + \
+       sys.argv[0] + ' [play] <filename|web link>\n' + \
+       sys.argv[0] + ' [pause]\n' + \
+       sys.argv[0] + ' [stop]\n' + \
+       sys.argv[0] + ' [get]  <property>\n' + \
+       sys.argv[0] + ' [set]  <property> <value>'
+
 
 def create_control_file():
   os.mkfifo(socketfile)
@@ -71,24 +79,28 @@ def command(com):
   mpv.command(com)
   mpv.teardown_socket()
 
-def main(args):
-  if len(sys.argv) == 2:
-    if   sys.argv[1] == 'pause':
+def main(args=[]):
+  if len(args) <= 1:
+    print(help)
+  if len(args) == 2:
+    if   args[1] == 'pause':
       command('cycle pause')
-    elif sys.argv[1] == 'stop':
+    elif args[1] == 'stop':
       command('stop')
-    elif sys.argv[1] == 'next_chapter':
+    elif args[1] == 'next_chapter':
       command('add chapter 1')
-    elif sys.argv[1] == 'prev_chapter':
+    elif args[1] == 'prev_chapter':
       command('add chapter -1')
-  elif len(sys.argv) > 2:
-    if   sys.argv[1] == 'play':
-      play(sys.argv[2])
-    elif sys.argv[1] == 'get':
-      print(get(sys.argv[2]))
-    elif sys.argv[1] == 'set':
-      if len(sys.argv) > 3:
-        set(sys.argv[2], sys.argv[3])
+    else:
+      play(args[1])
+  elif len(args) > 2:
+    if   args[1] == 'play':
+      play(args[2])
+    elif args[1] == 'get':
+      print(get(args[2]))
+    elif args[1] == 'set':
+      if len(args) > 3:
+        set(args[2], args[3])
 
 if __name__ == '__main__':
   main(sys.argv)

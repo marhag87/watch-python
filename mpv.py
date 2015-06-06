@@ -13,6 +13,8 @@ class mpv_control():
       self.mpv_socket.connect(mysocket)
     except ConnectionRefusedError:
       raise
+    except FileNotFoundError:
+      raise
 
   def teardown_socket(self):
     self.mpv_socket.close()

@@ -5,10 +5,20 @@ import sys
 import os
 import stat
 import time
-from play import generate_play_command, create_control_file, remove_control_file, play, get, set, command, socketfile
+import mock
+
+from play import generate_play_command, create_control_file, remove_control_file, play, get, set, command, socketfile, help
+from play import main as play_main
 from mpv import mpv_control
 
 class TestPlayInterface(unittest.TestCase):
+
+  @mock.patch('play.play')
+  def test_should_assume_only_one_arg_means_play(self, mock_main):
+    url = 'https://www.youtube.com/watch?v=5u3iv8AT8G8'
+    play_main(['play.py', url])
+
+    mock_main.assert_called_with(url)
 
   def test_playing_file_returns_sane_command(self):
     play_command = generate_play_command(sys.argv[0])
