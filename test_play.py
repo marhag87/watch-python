@@ -4,7 +4,7 @@ import unittest
 import sys
 import os
 import stat
-from play import generate_play_command, create_control_file, remove_control_file
+from play import generate_play_command, create_control_file, remove_control_file, control
 
 class TestPlayInterface(unittest.TestCase):
 
@@ -44,6 +44,25 @@ class TestPlayInterface(unittest.TestCase):
     remove_control_file()
     with self.assertRaises(FileNotFoundError):
       stat.S_ISFIFO(os.stat('/tmp/mpv_control').st_mode)
+
+  def test_command_should_fail_if_fifo_file_is_absent(self):
+    remove_control_file()
+    with self.assertRaises(FileNotFoundError):
+      control('wat')
+
+  def test_can_send_commands_through_fifo(self):
+    remove_control_file()
+    create_control_file()
+    pid = os.fork()
+    if pid:
+      fifo = open('/tmp/mpv_control', 'r')
+      result = fifo.read()
+      fifo.close()
+      self.assertEqual('wat\n', result)
+    else:
+      control('wat')
+      # Use os instead of sys. This skips cleanups but doesn't raise errors
+      os._exit(0)
 
 
 if __name__ == '__main__':
