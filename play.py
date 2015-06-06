@@ -25,7 +25,7 @@ def control(arg):
     raise
 
 def generate_play_command(name):
-  if os.path.isfile(name):
+  if os.path.isfile(name) or name.startswith('http'):
     return ['mpv', '-x11-name', 'tv', '--mute=no', '--alang=jpn', '--input-file', '/tmp/mpv_control', name]
   else:
     raise FileNotFoundError('Could not find file: ' + name)

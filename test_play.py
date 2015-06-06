@@ -64,6 +64,10 @@ class TestPlayInterface(unittest.TestCase):
       # Use os instead of sys. This skips cleanups but doesn't raise errors
       os._exit(0)
 
+  def test_should_be_able_to_play_http_content(self):
+    play_command = generate_play_command('https://www.youtube.com/watch?v=5u3iv8AT8G8')
+
+    self.assertIn('https://www.youtube.com/watch?v=5u3iv8AT8G8', play_command)
 
 if __name__ == '__main__':
   unittest.main()
