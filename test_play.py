@@ -50,15 +50,6 @@ class TestPlayInterface(unittest.TestCase):
 
     self.assertIn('--no-video', play_command)
 
-  def test_should_check_that_file_exists(self):
-    play_command1 = generate_play_command(sys.argv[0])
-
-    self.assertIn(sys.argv[0], play_command1)
-
-    with self.assertRaises(FileNotFoundError):
-      play_command2 = generate_play_command('aksjghskjdhgkjsgdf')
-
-
   def test_should_create_and_remove_control_file(self):
     # Remove existing file
     remove_control_file()

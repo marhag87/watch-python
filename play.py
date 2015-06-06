@@ -28,32 +28,32 @@ def remove_control_file():
     pass
 
 def generate_play_command(name, idle=False, mute=False, video=True):
-  if os.path.isfile(name) or name.startswith('http'):
-    idle = 'yes' if idle else 'no'
-    mute = 'yes' if mute else 'no'
-    video = '' if video else '--no-video'
-    return ['mpv',
-            '-x11-name', 'tv',
-            '--mute=' + mute,
-            '--alang=jpn',
-            '--idle=' + idle,
-            video,
-            '--input-unix-socket', socketfile,
-            name]
-  else:
-    raise FileNotFoundError('Could not find file: ' + name)
+  idle = 'yes' if idle else 'no'
+  mute = 'yes' if mute else 'no'
+  video = '' if video else '--no-video'
+  return ['mpv',
+          '-x11-name', 'tv',
+          '--mute=' + mute,
+          '--alang=jpn',
+          '--idle=' + idle,
+          video,
+          '--input-unix-socket', socketfile,
+          name]
 
 def play(file, idle=False, mute=False, video=True, pause_spotify=True):
-  if pause_spotify:
-    control_spotify('Pause')
-  remove_control_file()
-  create_control_file()
-  p = subprocess.Popen(generate_play_command(file, idle=idle, mute=mute, video=video), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-  pid = os.fork()
-  if not pid:
-    p.wait()
+  if os.path.isfile(file) or file.startswith('http'):
+    if pause_spotify:
+      control_spotify('Pause')
     remove_control_file()
-    os._exit(0)
+    create_control_file()
+    p = subprocess.Popen(generate_play_command(file, idle=idle, mute=mute, video=video), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    pid = os.fork()
+    if not pid:
+      p.wait()
+      remove_control_file()
+      os._exit(0)
+  else:
+    raise FileNotFoundError('Could not find file: ' + file)
 
 def get(prop):
   mpv = mpv_control()
@@ -92,10 +92,7 @@ def main(args=[]):
     elif args[1] == 'prev_chapter':
       command('add chapter -1')
     else:
-      if os.path.isfile(args[1]) or args[1].startswith('http'):
-        play(args[1])
-      else:
-        raise FileNotFoundError('Could not find file: ' + args[1])
+      play(args[1])
   elif len(args) > 2:
     if   args[1] == 'play':
       play(args[2])
