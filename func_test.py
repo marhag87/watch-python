@@ -7,6 +7,7 @@ from contextlib import redirect_stdout
 from time import sleep
 
 from play import main, get, help
+from sort import sort_seen
 
 class TestMpvScript(unittest.TestCase):
 
@@ -53,20 +54,27 @@ class TestMpvScript(unittest.TestCase):
 
   def test_files_get_sorted(self):
     # After Joe has played a file from /home/$USER/series/, it
-    # shows up in /home/$USER/series/Seen/
+    # shows up in the appropriate folder for that show
     path = '/home/' + os.getlogin() + '/series/'
-    file = 'test_file'
+    file = 'test_file01'
     filename = path + file
-    new_filename = path + 'Seen/' + file
+    new_filename = path + 'test_file/' + file
     open(filename, 'a').close()
+    direxists = os.path.exists(path + 'test_file')
+    if not direxists:
+      os.makedirs(path + 'test_file')
 
     main(['play.py', filename])
+    sleep(1)
+    sort_seen(path + 'Seen/' + file) # This should be done in the main script, but I don't dare adding it there yet
     sleep(1)
 
     self.assertTrue(os.path.isfile(new_filename))
 
     sleep(1) # Give it some time to clean up
     os.remove(new_filename)
+    if not direxists:
+      os.rmdir(path + 'test_file')
 
 if __name__ == '__main__':
   unittest.main()
