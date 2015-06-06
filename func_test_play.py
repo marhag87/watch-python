@@ -18,7 +18,13 @@ class TestMpvScrip(unittest.TestCase):
 
     self.assertEqual(help, out.getvalue().strip())
 
-    # After seeing the help, he plays a video
+    # After seeing the help, he tries to play a video, but
+    # he enters a filename that doesn't exist and gets an error
+    filename = 'sjgjhsgfjhvajhasjhfv'
+    with self.assertRaises(FileNotFoundError):
+      main(['play.py', filename])
+
+    # Joe plays a file that exists
     main(['play.py', 'https://www.youtube.com/watch?v=B1WiYtAfNoQ'])
     sleep(2)
 

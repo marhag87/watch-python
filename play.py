@@ -92,7 +92,10 @@ def main(args=[]):
     elif args[1] == 'prev_chapter':
       command('add chapter -1')
     else:
-      play(args[1])
+      if os.path.isfile(args[1]) or args[1].startswith('http'):
+        play(args[1])
+      else:
+        raise FileNotFoundError('Could not find file: ' + args[1])
   elif len(args) > 2:
     if   args[1] == 'play':
       play(args[2])
