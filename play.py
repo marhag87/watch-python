@@ -29,7 +29,12 @@ def play(file, idle=False, mute=False):
   control_spotify('Pause')
   remove_control_file()
   create_control_file()
-  subprocess.Popen(generate_play_command(file, idle=idle, mute=mute), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+  p = subprocess.Popen(generate_play_command(file, idle=idle, mute=mute), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+  pid = os.fork()
+  if not pid:
+    p.wait()
+    remove_control_file()
+    os._exit(0)
 
 def get(prop):
   mpv = mpv_control()
