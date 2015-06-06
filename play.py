@@ -71,17 +71,9 @@ def command(com):
   mpv.command(com)
   mpv.teardown_socket()
 
-if __name__ == '__main__':
-  if len(sys.argv) > 2:
-    if sys.argv[1] == 'play':
-      play(sys.argv[2])
-    elif sys.argv[1] == 'get':
-      print(get(sys.argv[2]))
-    elif sys.argv[1] == 'set':
-      if len(sys.argv) > 3:
-        set(sys.argv[2], sys.argv[3])
-  elif len(sys.argv) == 2:
-    if sys.argv[1] == 'pause':
+def main(args):
+  if len(sys.argv) == 2:
+    if   sys.argv[1] == 'pause':
       command('cycle pause')
     elif sys.argv[1] == 'stop':
       command('stop')
@@ -89,3 +81,14 @@ if __name__ == '__main__':
       command('add chapter 1')
     elif sys.argv[1] == 'prev_chapter':
       command('add chapter -1')
+  elif len(sys.argv) > 2:
+    if   sys.argv[1] == 'play':
+      play(sys.argv[2])
+    elif sys.argv[1] == 'get':
+      print(get(sys.argv[2]))
+    elif sys.argv[1] == 'set':
+      if len(sys.argv) > 3:
+        set(sys.argv[2], sys.argv[3])
+
+if __name__ == '__main__':
+  main(sys.argv)
