@@ -80,7 +80,7 @@ class TestPlayInterface(unittest.TestCase):
     pause = get('pause')
     self.assertEqual(pause, False)
 
-    set('pause', True)
+    set('pause', 'yes')
     pause = get('pause')
     self.assertEqual(pause, True)
 
