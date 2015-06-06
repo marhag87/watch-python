@@ -4,6 +4,7 @@ import sys
 import os
 import stat
 import subprocess
+from control_spotify import control_spotify
 
 def create_control_file():
   os.mkfifo('/tmp/mpv_control')
@@ -34,6 +35,7 @@ def generate_play_command(name):
 if __name__ == '__main__':
   if len(sys.argv) > 2:
     if sys.argv[1] == 'play':
+      control_spotify('Pause')
       remove_control_file()
       create_control_file()
       subprocess.check_call(generate_play_command(sys.argv[2]))

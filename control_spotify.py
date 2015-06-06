@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import dbus
 import sys
-import os
 
 def control_spotify(command):
+  import dbus
+  import sys
+  import os
   os.environ['DISPLAY'] = ':0.0'
   session = dbus.SessionBus.get_session()
   spotify = session.get_object(
