@@ -19,19 +19,28 @@ def remove_control_file():
   except:
     pass
 
-def generate_play_command(name, idle=False, mute=False):
+def generate_play_command(name, idle=False, mute=False, video=True):
   if os.path.isfile(name) or name.startswith('http'):
     idle = 'yes' if idle else 'no'
     mute = 'yes' if mute else 'no'
-    return ['mpv', '-x11-name', 'tv', '--mute=' + mute, '--alang=jpn', '--idle=' + idle, '--input-unix-socket', socketfile, name]
+    video = '' if video else '--no-video'
+    return ['mpv',
+            '-x11-name', 'tv',
+            '--mute=' + mute,
+            '--alang=jpn',
+            '--idle=' + idle,
+            video,
+            '--input-unix-socket', socketfile,
+            name]
   else:
     raise FileNotFoundError('Could not find file: ' + name)
 
-def play(file, idle=False, mute=False):
-  control_spotify('Pause')
+def play(file, idle=False, mute=False, video=True, pause_spotify=True):
+  if pause_spotify:
+    control_spotify('Pause')
   remove_control_file()
   create_control_file()
-  p = subprocess.Popen(generate_play_command(file, idle=idle, mute=mute), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+  p = subprocess.Popen(generate_play_command(file, idle=idle, mute=mute, video=video), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
   pid = os.fork()
   if not pid:
     p.wait()
@@ -40,10 +49,14 @@ def play(file, idle=False, mute=False):
 
 def get(prop):
   mpv = mpv_control()
-  mpv.setup_socket(socketfile)
-  result = mpv.get(prop)
-  mpv.teardown_socket()
-  return result
+  try:
+    mpv.setup_socket(socketfile)
+    result = mpv.get(prop)
+    mpv.teardown_socket()
+    return result
+  except:
+    mpv.teardown_socket()
+    raise
 
 def set(prop, value):
   mpv = mpv_control()

@@ -18,6 +18,7 @@ class TestPlayInterface(unittest.TestCase):
       '--mute=no',
       '--alang=jpn',
       '--idle=no',
+      '',
       '--input-unix-socket', socketfile,
       sys.argv[0]
     ]
@@ -33,6 +34,11 @@ class TestPlayInterface(unittest.TestCase):
     play_command = generate_play_command(sys.argv[0], mute=True)
 
     self.assertIn('--mute=yes', play_command)
+
+  def test_should_be_able_to_start_mpv_in_novideo_mode(self):
+    play_command = generate_play_command(sys.argv[0], video=False)
+
+    self.assertIn('--no-video', play_command)
 
   def test_should_check_that_file_exists(self):
     play_command1 = generate_play_command(sys.argv[0])
@@ -68,7 +74,7 @@ class TestPlayInterface(unittest.TestCase):
     mpv.teardown_socket()
 
   def test_can_send_commands_through_fifo(self):
-    play('https://www.youtube.com/watch?v=B1WiYtAfNoQ', mute=True)
+    play('https://www.youtube.com/watch?v=B1WiYtAfNoQ', mute=True, video=False, pause_spotify=False)
     time.sleep(2)
 
     pause = get('pause')
