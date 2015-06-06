@@ -25,11 +25,12 @@ class TestMpvScrip(unittest.TestCase):
       main(['play.py', filename])
 
     # Joe plays a file that exists
-    main(['play.py', 'https://www.youtube.com/watch?v=B1WiYtAfNoQ'])
+    filename = 'https://www.youtube.com/watch?v=B1WiYtAfNoQ'
+    main(['play.py', filename])
     sleep(2)
 
     path = get('path')
-    self.assertEqual('https://www.youtube.com/watch?v=B1WiYtAfNoQ', path)
+    self.assertEqual(filename, path)
 
     # Joe needs to get a drink, so he pauses the video
     main(['play.py', 'pause'])
