@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import unittest
+import os
 from io import StringIO
 from contextlib import redirect_stdout
 from time import sleep
 
 from play import main, get, help
 
-class TestMpvScrip(unittest.TestCase):
+class TestMpvScript(unittest.TestCase):
 
   def test_script_can_play_video(self):
     # Joe wants to play a video, he runs the script
@@ -49,6 +50,23 @@ class TestMpvScrip(unittest.TestCase):
 
     # Not wanting to watch any longer, Joe stops the video
     main(['play.py', 'stop'])
+
+  def test_files_get_sorted(self):
+    # After Joe has played a file from /home/$USER/series/, it
+    # shows up in /home/$USER/series/Seen/
+    path = '/home/' + os.getlogin() + '/series/'
+    file = 'test_file'
+    filename = path + file
+    new_filename = path + 'Seen/' + file
+    open(filename, 'a').close()
+
+    main(['play.py', filename])
+    sleep(1)
+
+    self.assertTrue(os.path.isfile(new_filename))
+
+    sleep(1) # Give it some time to clean up
+    os.remove(new_filename)
 
 if __name__ == '__main__':
   unittest.main()
