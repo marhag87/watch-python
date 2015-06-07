@@ -4,7 +4,7 @@ import shutil
 import os
 import re
 
-path = '/home/' + os.getlogin() + '/series/'
+path = '/storage/series/'
 
 def move(file):
   file = os.path.realpath(file)
