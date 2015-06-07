@@ -7,10 +7,16 @@ import re
 path = '/home/' + os.getlogin() + '/series/'
 
 def move(file):
+  file = os.path.realpath(file)
   if file.startswith(path):
     name = file.split('/')[-1]
     series = get_series(name)
-    shutil.move(file, file.replace(path, path + series + '/'))
+    try:
+      if path + name == file:
+        shutil.move(file, file.replace(path, path + series + '/'))
+    except FileNotFoundError:
+      shutil.move(file, file.replace(path, path + 'Seen/'))
+    link_next_episode(name)
 
 def get_series(filename):
   # Remove '.S10E22*'

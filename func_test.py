@@ -8,7 +8,7 @@ from contextlib import redirect_stdout
 from time import sleep
 
 from play import main, get, help
-from sort import move, link_next_episode
+from sort import move, link_next_episode, path
 
 class TestMpvScript(unittest.TestCase):
 
@@ -53,11 +53,11 @@ class TestMpvScript(unittest.TestCase):
     # Not wanting to watch any longer, Joe stops the video
     main(['play.py', 'stop'])
 
+  @mock.patch('sort.os.path')
   @mock.patch('sort.shutil')
-  def test_files_are_moved_to_respecive_series(self, mock_shutil):
+  def test_files_are_moved_to_respecive_series(self, mock_shutil, mock_ospath):
     # After watching an episode, Joe notices that the file has been
     # moved to the appropriate folder for the series
-    path = '/home/' + os.getlogin() + '/series/'
     file1 = 'Attraction.Collapse.S02E04.720p.HDTV.x264-BATV.mkv'
     filename1 = path + file1
     file2 = 'Physician.Which.2005.S09E00.Last.Christmas.720p.HDTV.x264-FoV.mkv'
@@ -76,6 +76,7 @@ class TestMpvScript(unittest.TestCase):
     filename8 = path + file8
     file9 = 'My Teacher Has a Horce-face 01.mkv'
     filename9 = path + file9
+    mock_ospath.realpath.side_effect = [ path + file1, path + file2, path + file3, path + file4, path + file5, path + file6, path + file7, path + file8, path + file9, ]
 
     move(filename1)
     mock_shutil.move.assert_called_with(filename1, path + 'Attraction Collapse/' + file1)
@@ -100,7 +101,6 @@ class TestMpvScript(unittest.TestCase):
   def test_link_to_next_episode_is_created(self, mock_os):
     # After watching an episode, Joe sees that the next episode has
     # been linked with the name "next" in the appropriate series folder
-    path = '/home/' + os.getlogin() + '/series/Attraction Collapse/'
     file1 = 'Attraction.Collapse.S02E04.720p.HDTV.x264-BATV.mkv'
     next_episode = 'Attraction.Collapse.S02E05.720p.HDTV.x264-BATV.mkv'
     filename1 = path + file1
@@ -115,16 +115,15 @@ class TestMpvScript(unittest.TestCase):
     ]
 
     link_next_episode(file1)
-    mock_os.unlink.assert_called_with(path + 'next')
-    mock_os.symlink.assert_called_with(path + next_episode, path + 'next')
+    mock_os.unlink.assert_called_with(path + 'Attraction Collapse/next')
+    mock_os.symlink.assert_called_with(path + 'Attraction Collapse/' + next_episode, path + 'Attraction Collapse/next')
 
   @mock.patch('sort.os')
   def test_link_to_next_episode_is_not_created_if_its_the_last_episode(self, mock_os):
     # Having finished all episodes, Joe notices that there no longer is a
     # "next" link
-    path = '/home/' + os.getlogin() + '/series/Attraction Collapse/'
     file1 = 'Attraction.Collapse.S02E04.720p.HDTV.x264-BATV.mkv'
-    filename1 = path + file1
+    filename1 = path + 'Attraction Collapse/' + file1
     mock_os.walk.return_value = [
       (
         (),
@@ -136,7 +135,7 @@ class TestMpvScript(unittest.TestCase):
     ]
 
     link_next_episode(file1)
-    mock_os.unlink.assert_called_with(path + 'next')
+    mock_os.unlink.assert_called_with(path + 'Attraction Collapse/next')
     self.assertFalse(mock_os.symlink.called)
 
 if __name__ == '__main__':
