@@ -4,23 +4,9 @@ import unittest
 import mock
 import os
 
-from sort import move, sort_seen
+from sort import move, get_next_episode, link_next_episode
 
 class TestSort(unittest.TestCase):
-
-  @mock.patch('sort.shutil')
-  def test_files_from_series_folder_are_moved(self, mock_shutil):
-    path = '/home/' + os.getlogin() + '/series/'
-    file1 = 'test_file01'
-    filename1 = path + file1
-    file2 = 'test_file02'
-    filename2 = path + file2
-
-    move(filename1)
-    mock_shutil.move.assert_called_with(filename1, path + 'Seen/' + file1)
-
-    move(filename2)
-    mock_shutil.move.assert_called_with(filename2, path + 'Seen/' + file2)
 
   @mock.patch('sort.shutil')
   def test_files_from_other_folders_are_NOT_moved(self, mock_shutil):
@@ -36,32 +22,50 @@ class TestSort(unittest.TestCase):
 
     self.assertFalse(mock_shutil.move.called)
 
-  @mock.patch('sort.shutil')
-  def test_files_from_seen_folder_are_moved_to_respecive_series(self, mock_shutil):
-    path = '/home/' + os.getlogin() + '/series/'
-    file1 = 'test_file01'
-    filename1 = path + 'Seen/' + file1
-    file2 = 'test_file02'
-    filename2 = path + 'Seen/' + file2
+  @mock.patch('sort.os')
+  def test_can_find_next_episode(self, mock_os):
+    mock_os.walk.return_value = [
+      (
+        (),
+        (),
+        ('Physician.Which.2005.S08E03.720p.HDTV.x264-FoV.mkv',
+         'Physician.Which.2005.S08E02.720p.HDTV.x264-FoV.mkv',
+         'Physician.Which.2005.S08E01.720p.HDTV.x264-FoV.mkv',
+         'Physician.Which.2005.S08E04.720p.HDTV.x264-FoV.mkv'
+        ),
+      ),
+    ]
 
-    sort_seen(filename1)
-    mock_shutil.move.assert_called_with(filename1, path + 'test_file/test_file01')
-    sort_seen(filename2)
-    mock_shutil.move.assert_called_with(filename2, path + 'test_file/test_file02')
+    next_episode = get_next_episode('Physician.Which.2005.S08E02.720p.HDTV.x264-FoV.mkv', 'Physician Which')
 
-  @mock.patch('sort.shutil')
-  def test_files_from_other_folders_are_NOT_sorted(self, mock_shutil):
-    filename = '/home/' + os.getlogin() + '/series/test_file01'
-    sort_seen(filename)
+    self.assertEqual(next_episode, 'Physician.Which.2005.S08E03.720p.HDTV.x264-FoV.mkv')
 
-    self.assertFalse(mock_shutil.move.called)
+  @mock.patch('sort.os')
+  def test_doesnt_shit_itself_if_no_episodes(self, mock_os):
+    mock_os.walk.return_value = [((),(),(),),]
 
-  @mock.patch('sort.shutil')
-  def test_web_files_are_NOT_sorted(self, mock_shutil):
-    filename = 'https://www.youtube.com/watch?v=B1WiYtAfNoQ'
-    sort_seen(filename)
+    next_episode = get_next_episode('Physician.Which.2005.S08E02.720p.HDTV.x264-FoV.mkv', 'Physician Which')
 
-    self.assertFalse(mock_shutil.move.called)
+    self.assertEqual(next_episode, None)
+
+  @mock.patch('sort.os.path')
+  @mock.patch('sort.os')
+  def test_only_unlink_symlinks(self, mock_ospath, mock_os):
+    mock_ospath.path.islink.return_value = True
+
+    mock_os.walk.return_value = [
+      (
+        (),
+        (),
+        ('My Teacher Has a Horse-face 01.mkv',
+         'next',
+        ),
+      ),
+    ]
+
+    link_next_episode('My Teacher Has a Horse-face 01.mkv')
+
+    self.assertFalse(mock_os.unlink.called)
 
 if __name__ == '__main__':
   unittest.main()

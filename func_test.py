@@ -2,12 +2,13 @@
 
 import unittest
 import os
+import mock
 from io import StringIO
 from contextlib import redirect_stdout
 from time import sleep
 
 from play import main, get, help
-from sort import sort_seen
+from sort import move, link_next_episode
 
 class TestMpvScript(unittest.TestCase):
 
@@ -52,29 +53,91 @@ class TestMpvScript(unittest.TestCase):
     # Not wanting to watch any longer, Joe stops the video
     main(['play.py', 'stop'])
 
-  def test_files_get_sorted(self):
-    # After Joe has played a file from /home/$USER/series/, it
-    # shows up in the appropriate folder for that show
+  @mock.patch('sort.shutil')
+  def test_files_are_moved_to_respecive_series(self, mock_shutil):
+    # After watching an episode, Joe notices that the file has been
+    # moved to the appropriate folder for the series
     path = '/home/' + os.getlogin() + '/series/'
-    file = 'test_file01'
-    filename = path + file
-    new_filename = path + 'test_file/' + file
-    open(filename, 'a').close()
-    direxists = os.path.exists(path + 'test_file')
-    if not direxists:
-      os.makedirs(path + 'test_file')
+    file1 = 'Attraction.Collapse.S02E04.720p.HDTV.x264-BATV.mkv'
+    filename1 = path + file1
+    file2 = 'Physician.Which.2005.S09E00.Last.Christmas.720p.HDTV.x264-FoV.mkv'
+    filename2 = path + file2
+    file3 = 'top.kek.s22e03.720p.HDTV.x264-ORGANiC.mkv'
+    filename3 = path + file3
+    file4 = '[TerribleConnotations] Demise Procession - 10 [720p].mkv'
+    filename4 = path + file4
+    file5 = '[TerribleConnotations] Bugwrangler S2 - 22 [720p].mkv'
+    filename5 = path + file5
+    file6 = '[What]_Cherry_Projectiles_-_01_[1280x720_H.264_AAC][1FBF88D2].mkv'
+    filename6 = path + file6
+    file7 = '[TerribleConnotations] My Teacher Has a Horse-head - 02 [1080p].mkv'
+    filename7 = path + file7
+    file8 = '[Coalgirls]_Hunter_X_Hunter_117_(1920x1080_Blu-ray_FLAC)_[8056C087].mkv'
+    filename8 = path + file8
+    file9 = 'My Teacher Has a Horce-face 01.mkv'
+    filename9 = path + file9
 
-    main(['play.py', filename])
-    sleep(1)
-    sort_seen(path + 'Seen/' + file) # This should be done in the main script, but I don't dare adding it there yet
-    sleep(1)
+    move(filename1)
+    mock_shutil.move.assert_called_with(filename1, path + 'Attraction Collapse/' + file1)
+    move(filename2)
+    mock_shutil.move.assert_called_with(filename2, path + 'Physician Which/' + file2)
+    move(filename3)
+    mock_shutil.move.assert_called_with(filename3, path + 'Top Kek/' + file3)
+    move(filename4)
+    mock_shutil.move.assert_called_with(filename4, path + 'Demise Procession/' + file4)
+    move(filename5)
+    mock_shutil.move.assert_called_with(filename5, path + 'Bugwrangler/' + file5)
+    move(filename6)
+    mock_shutil.move.assert_called_with(filename6, path + 'Cherry Projectiles/' + file6)
+    move(filename7)
+    mock_shutil.move.assert_called_with(filename7, path + 'My Teacher Has a Horse-head/' + file7)
+    move(filename8)
+    mock_shutil.move.assert_called_with(filename8, path + 'Hunter x Hunter/' + file8)
+    move(filename9)
+    mock_shutil.move.assert_called_with(filename9, path + 'My Teacher Has a Horce-face/' + file9)
 
-    self.assertTrue(os.path.isfile(new_filename))
+  @mock.patch('sort.os')
+  def test_link_to_next_episode_is_created(self, mock_os):
+    # After watching an episode, Joe sees that the next episode has
+    # been linked with the name "next" in the appropriate series folder
+    path = '/home/' + os.getlogin() + '/series/Attraction Collapse/'
+    file1 = 'Attraction.Collapse.S02E04.720p.HDTV.x264-BATV.mkv'
+    next_episode = 'Attraction.Collapse.S02E05.720p.HDTV.x264-BATV.mkv'
+    filename1 = path + file1
+    mock_os.walk.return_value = [
+      (
+        (),
+        (),
+        (file1,
+         next_episode,
+        ),
+      ),
+    ]
 
-    sleep(1) # Give it some time to clean up
-    os.remove(new_filename)
-    if not direxists:
-      os.rmdir(path + 'test_file')
+    link_next_episode(file1)
+    mock_os.unlink.assert_called_with(path + 'next')
+    mock_os.symlink.assert_called_with(path + next_episode, path + 'next')
+
+  @mock.patch('sort.os')
+  def test_link_to_next_episode_is_not_created_if_its_the_last_episode(self, mock_os):
+    # Having finished all episodes, Joe notices that there no longer is a
+    # "next" link
+    path = '/home/' + os.getlogin() + '/series/Attraction Collapse/'
+    file1 = 'Attraction.Collapse.S02E04.720p.HDTV.x264-BATV.mkv'
+    filename1 = path + file1
+    mock_os.walk.return_value = [
+      (
+        (),
+        (),
+        (file1,
+         'next',
+        ),
+      ),
+    ]
+
+    link_next_episode(file1)
+    mock_os.unlink.assert_called_with(path + 'next')
+    self.assertFalse(mock_os.symlink.called)
 
 if __name__ == '__main__':
   unittest.main()
