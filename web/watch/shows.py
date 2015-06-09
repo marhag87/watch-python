@@ -11,6 +11,8 @@ def get_shows():
     try:
       shows.remove('Finished')
       shows.remove('Seen')
+      shows.remove('Crap')
+      shows.remove('Maybe later')
     except ValueError:
       pass
     return shows

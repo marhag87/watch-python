@@ -64,6 +64,6 @@ class NewVisitorTest(FunctionalTest):
 
     # He decides to watch the first episode he hasn't seen, which is marked green
     next_episode = self.browser.find_element_by_class_name('next_episode')
-    self.assertEqual(next_episode.value_of_css_property('background-color'), 'rgba(0, 128, 0, 1)')
+    self.assertEqual(next_episode.value_of_css_property('background-color'), 'rgba(230, 230, 230, 1)')
 
     # Having watched the show, Joe is satisfied and goes to sleep

@@ -1,11 +1,14 @@
 <html>
   <head>
     <title>Martin's Kickass Watch List</title>
+    <link href="/static/watch.css" rel="stylesheet" media="screen">
   </head>
   <body>
+    <div id="content">
     {% for show in shows %}
-      <div class="show" data-show="{{ show }}"><a class="showlink" href="/show/{{ show }}">{{ show }}</a></div>
+      <div class="show" data-show="{{ show }}"><a class="showlink" href="/show/{{ show }}"><img src="/static/images/banners/{{ show }}.webp"></a></div>
     {% endfor %}
+    </div>
     <form>
       <input type="text" id="filterbox">
     </form>

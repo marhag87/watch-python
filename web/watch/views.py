@@ -11,4 +11,4 @@ def home(request):
 def show(request, show):
   episodes = get_episodes(show)
   next_episode = get_next_episode(show)
-  return render(request, 'show.html', {'episodes': episodes, 'next_episode': next_episode})
+  return render(request, 'show.html', {'episodes': episodes, 'next_episode': next_episode, 'show': show})
