@@ -41,7 +41,7 @@ class NewVisitorTest(FunctionalTest):
     shows = self.browser.find_elements_by_class_name('show')
     allshows = ['Attraction Collapse', 'Top Kek', 'Bugwrangler', 'My Teacher Has a Horse-head']
     for myshow in allshows:
-      self.assertIn(myshow, [show.text for show in shows])
+      self.assertIn(myshow, [show.get_attribute('data-show') for show in shows])
 
     # Not seeing the show he wants to watch instantly, he
     # tries searching for it
@@ -51,7 +51,7 @@ class NewVisitorTest(FunctionalTest):
     filterbox.send_keys('Top Kek')
     shows = self.browser.find_elements_by_class_name('show')
     for show in shows:
-      if show.text == 'Top Kek':
+      if show.get_attribute('data-show') == 'Top Kek':
         self.assertEqual(show.is_displayed(), True)
       else:
         self.assertEqual(show.is_displayed(), False)
