@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Javascript tests</title>
+    <link rel="stylesheet" href="qunit.css">
+</head>
+
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture">
+        <div class="show" data-show="Attraction Collapse">Attraction Collapse</div>
+        <div class="show" data-show="Top Kek">Top Kek</div>
+        <div class="show" data-show="Bugwrangler">Bugwrangler</div>
+        <div class="episode" data-episode="Attraction.Collapse.S01E01.mkv">Attraction.Collapse.S01E01.mkv</div>
+        <div class="episode" data-episode="Attraction.Collapse.S01E02.mkv">Attraction.Collapse.S01E02.mkv</div>
+        <div class="episode" data-episode="Attraction.Collapse.S01E03.mkv">Attraction.Collapse.S01E03.mkv</div>
+        <form>
+            <input id="filterbox" />
+        </form>
+    </div>
+
+    <script src="../jquery.min.js"></script>
+    <script src="qunit.js"></script>
+    <script src="../filter.js"></script>
+    <script>
+/*global $, test, equal */
+test("shows and episodes should be hidden when searched for", function () {
+    equal($('[data-show="Attraction Collapse"]').is(':visible'), true);
+    equal($('[data-show="Top Kek"]').is(':visible'), true);
+    equal($('[data-show="Bugwrangler"]').is(':visible'), true);
+    equal($('[data-episode="Attraction.Collapse.S01E01.mkv"]').is(':visible'), true);
+    equal($('[data-episode="Attraction.Collapse.S01E02.mkv"]').is(':visible'), true);
+    equal($('[data-episode="Attraction.Collapse.S01E03.mkv"]').is(':visible'), true);
+    $('#filterbox').val('Top Kek');
+    $('#filterbox').trigger('keyup');
+    equal($('[data-show="Attraction Collapse"]').is(':visible'), false);
+    equal($('[data-show="Top Kek"]').is(':visible'), true);
+    equal($('[data-show="Bugwrangler"]').is(':visible'), false);
+    $('#filterbox').val('Bug');
+    $('#filterbox').trigger('keyup');
+    equal($('[data-show="Attraction Collapse"]').is(':visible'), false);
+    equal($('[data-show="Top Kek"]').is(':visible'), false);
+    equal($('[data-show="Bugwrangler"]').is(':visible'), true);
+    $('#filterbox').val('e02');
+    $('#filterbox').trigger('keyup');
+    equal($('[data-episode="Attraction.Collapse.S01E01.mkv"]').is(':visible'), false);
+    equal($('[data-episode="Attraction.Collapse.S01E02.mkv"]').is(':visible'), true);
+    equal($('[data-episode="Attraction.Collapse.S01E03.mkv"]').is(':visible'), false);
+    $('#filterbox').val('e03');
+    $('#filterbox').trigger('keyup');
+    equal($('[data-episode="Attraction.Collapse.S01E01.mkv"]').is(':visible'), false);
+    equal($('[data-episode="Attraction.Collapse.S01E02.mkv"]').is(':visible'), false);
+    equal($('[data-episode="Attraction.Collapse.S01E03.mkv"]').is(':visible'), true);
+});
+    </script>
+
+</body>
+</html>

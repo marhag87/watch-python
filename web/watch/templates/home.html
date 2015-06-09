@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <title>Martin's Kickass Watch List</title>
+  </head>
+  <body>
+    {% for show in shows %}
+      <div class="show" data-show="{{ show }}"><a class="showlink" href="/show/{{ show }}">{{ show }}</a></div>
+    {% endfor %}
+    <form>
+      <input type="text" id="filterbox">
+    </form>
+  <script src="/static/jquery.min.js"></script>
+  <script src="/static/filter.js"></script>
+  </body>
+</html>
