@@ -32,3 +32,8 @@ html, body {
 .next_episode {
   background: rgb(103, 209, 103);
 }
+
+a {
+    text-decoration: none;
+    color: black;
+}
