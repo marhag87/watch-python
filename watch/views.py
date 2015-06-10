@@ -3,7 +3,7 @@
 import sys
 sys.path.insert(0, 'scripts')
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from watch.shows import get_shows, get_episodes, get_next_episode, path
 from scripts.play import play as mkvplay
@@ -19,4 +19,4 @@ def show(request, myshow):
 
 def play(request, myshow, episode):
   mkvplay(path + myshow + '/' + episode)
-  return show(request, myshow)
+  return redirect('/show/' + myshow)

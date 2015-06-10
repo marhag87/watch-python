@@ -72,7 +72,7 @@ class NewVisitorTest(FunctionalTest):
     self.assertEqual(next_episode.value_of_css_property('background-color'), 'rgba(230, 230, 230, 1)')
     next_episode.find_element_by_css_selector('a').click()
     episode_url = self.browser.current_url
-    self.assertRegex(episode_url, '/show/Top%20Kek/play/Top.Kek.S01E02.mkv')
+    self.assertEqual(episode_url, 'http://localhost:8081/show/Top%20Kek')
 
     mock_play.assert_called_with(path + 'Top Kek/Top.Kek.S01E02.mkv')
 
