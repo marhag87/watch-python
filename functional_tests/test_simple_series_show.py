@@ -3,15 +3,17 @@
 import mock
 import time
 import urllib
+import sys
+
+sys.path.insert(0, 'scripts')
 
 from .base import FunctionalTest
 from selenium import webdriver
 from watch.shows import path
-import scripts.play
 
 class NewVisitorTest(FunctionalTest):
 
-  @mock.patch('scripts.play')
+  @mock.patch('watch.views.mkvplay')
   @mock.patch('watch.shows.os.path')
   @mock.patch('watch.shows.os')
   def test_can_start_watching_an_episode(self, mock_os, mock_ospath, mock_play):
@@ -69,6 +71,8 @@ class NewVisitorTest(FunctionalTest):
     next_episode = self.browser.find_element_by_class_name('next_episode')
     self.assertEqual(next_episode.value_of_css_property('background-color'), 'rgba(230, 230, 230, 1)')
     next_episode.find_element_by_css_selector('a').click()
+    episode_url = self.browser.current_url
+    self.assertRegex(episode_url, '/show/Top%20Kek/play/Top.Kek.S01E02.mkv')
 
     mock_play.assert_called_with(path + 'Top Kek/Top.Kek.S01E02.mkv')
 

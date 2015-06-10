@@ -20,5 +20,6 @@ from watch import views
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
+    url(r'^show/(.+)/play/(.+)$', views.play, name='play'),
     url(r'^show/(.+)$', views.show, name='show'),
 ]

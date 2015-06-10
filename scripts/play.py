@@ -6,7 +6,7 @@ import stat
 import subprocess
 from control_spotify import control_spotify
 from mpv import mpv_control
-import sort
+from sort import move
 
 socketfile = '/tmp/mpv_control'
 help = 'Usage:\n' + \
@@ -52,7 +52,7 @@ def play(file, idle=False, mute=False, video=True, pause_spotify=True):
       p = subprocess.Popen(generate_play_command(file, idle=idle, mute=mute, video=video), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
       p.wait()
       remove_control_file()
-      sort.move(file)
+      move(file)
       os._exit(0)
   else:
     raise FileNotFoundError('Could not find file: ' + file)
