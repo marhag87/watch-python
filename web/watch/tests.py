@@ -77,7 +77,7 @@ class EpisodeTest(TestCase):
 
   @mock.patch('watch.shows.os')
   def test_episodes_should_come_back_sorted(self, mock_os):
-    episodes = ('Attraction.Collapse.S01E02.mkv','Attraction.Collapse.S01E01.mkv')
+    episodes = ('Attraction.Collapse.S01E02.mkv','attraction.collapse.s01e01.mkv')
     mock_os.walk.return_value = [
       (
         (),
@@ -87,12 +87,11 @@ class EpisodeTest(TestCase):
     ]
     result_episodes = get_episodes('Attraction Collapse')
     episodes = list(episodes)
-    episodes.sort()
-    self.assertEqual(episodes, result_episodes)
+    self.assertEqual(['attraction.collapse.s01e01.mkv', 'Attraction.Collapse.S01E02.mkv'], result_episodes)
 
   @mock.patch('watch.shows.os')
   def test_episodes_should_not_return_the_next_file(self, mock_os):
-    episodes = ('Attraction.Collapse.S01E01.mkv','Attraction.Collapse.S01E02.mkv')
+    episodes = ('attraction.collapse.s01e01.mkv','Attraction.Collapse.S01E02.mkv')
     mock_os.walk.return_value = [
       (
         (),

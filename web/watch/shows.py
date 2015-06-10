@@ -20,7 +20,7 @@ def get_shows():
 def get_episodes(show):
   for (_,_,files) in os.walk(path + show):
     episodes = list(files)
-    episodes.sort()
+    episodes = sorted(episodes, key=lambda s: s.lower())
     try:
       episodes.remove('next')
     except ValueError:
