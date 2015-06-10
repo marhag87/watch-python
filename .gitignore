@@ -3,4 +3,4 @@
 __pycache__
 __init__.py
 *.sqlite3
-web/watch/static/images/
+watch/static/images/
