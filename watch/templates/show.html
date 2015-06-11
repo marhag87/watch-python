@@ -1,18 +1,8 @@
-<html>
-  <head>
-    <title>Martin's Kickass Watch List</title>
-    <link href="/static/watch.css" rel="stylesheet" media="screen">
-  </head>
-  <body style="background-image: url('/static/images/backgrounds/{{ show }}.webp')">
-    <div id="content">
+{% extends 'base.html' %}
+
+{% block bodystyle %}style="background-image: url('/static/images/backgrounds/{{ show }}.webp')"{% endblock %}
+{% block content %}
     {% for episode in episodes %}
       <div class="episode{% if next_episode == episode %} next_episode{% endif %}" data-episode="{{ episode }}"><a href="/show/{{ show }}/play/{{ episode }}">{{ episode }}</a></div>
     {% endfor %}
-    </div>
-    <form>
-      <input type="text" id="filterbox">
-    </form>
-  <script src="/static/jquery.min.js"></script>
-  <script src="/static/filter.js"></script>
-  </body>
-</html>
+{% endblock %}

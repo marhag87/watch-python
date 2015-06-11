@@ -21,7 +21,10 @@ class mpv_control():
 
   def mpv_command(self, cmd):
     self.mpv_socket.send(cmd.encode())
-    ret = self.mpv_socket.recv(4096).decode()
+    try:
+      ret = self.mpv_socket.recv(4096).decode()
+    except socket.timeout:
+      return
     j = json.loads(ret.split('\n')[0])
     if j.get('error') == 'success' or j.get('error') == None:
       return(j.get('data'))

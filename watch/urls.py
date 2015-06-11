@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^show/(.+)/play/(.+)$', views.play, name='play'),
     url(r'^show/(.+)$', views.show, name='show'),
+    url(r'^command/(.+)$', views.command, name='command'),
 ]

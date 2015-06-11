@@ -4,6 +4,7 @@ from django.test import TestCase
 import mock
 
 from watch.shows import get_shows, get_episodes, get_next_episode, path
+from watch.views import command as view_command
 
 class HomePageTest(TestCase):
 
@@ -119,3 +120,16 @@ class NextEpisodeTest(TestCase):
     next_episode = get_next_episode('Attraction Collapse')
 
     self.assertEqual(next_episode, None)
+
+class MediaButtonsTest(TestCase):
+
+  @mock.patch('watch.views.mkvcommand')
+  def test_valid_command_should_have_empty_response(self, mock_mkvcommand):
+   response = view_command('', 'pause')
+   self.assertEqual(response.status_code, 200)
+   self.assertEqual(response.content, b'')
+
+  def test_invalid_command_should_give_error(self):
+   response = view_command('', 'blargh')
+   self.assertEqual(response.status_code, 400)
+   self.assertEqual(response.content, b'Invalid command') 

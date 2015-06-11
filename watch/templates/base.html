@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Martin's Kickass Watch List</title>
+    <link href="/static/watch.css" rel="stylesheet" media="screen">
+  </head>
+  <body{% block bodystyle %}{% endblock %}>
+    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="controls_padder"></div>
+    <div id="controls">
+      <div class="button" id="pause-button">Pause</div>
+      <div class="button" id="stop-button">Stop</div>
+      <div class="button" id="prevchapter-button">Prev chapter</div>
+      <div class="button" id="nextchapter-button">Next chapter</div>
+      <input type="text" id="filterbox">
+    </div>
+  <script src="/static/jquery.min.js"></script>
+  <script src="/static/filter.js"></script>
+  <script src="/static/command.js"></script>
+  </body>
+</html>
