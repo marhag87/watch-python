@@ -12,6 +12,7 @@ socketfile = '/tmp/mpv_control'
 help = 'Usage:\n' + \
        sys.argv[0] + ' <filename|web link>\n' + \
        sys.argv[0] + ' [play] <filename|web link>\n' + \
+       sys.argv[0] + ' [append] <filename|web link>\n' + \
        sys.argv[0] + ' [pause]\n' + \
        sys.argv[0] + ' [stop]\n' + \
        sys.argv[0] + ' [get]  <property>\n' + \
@@ -75,10 +76,13 @@ def set(prop, value):
   mpv.teardown_socket()
   return result
 
-def command(com):
+def command(com, json=False):
   mpv = mpv_control()
   mpv.setup_socket(socketfile)
-  mpv.command(com)
+  if json:
+    mpv.json_command(com)
+  else:
+    mpv.command(com)
   mpv.teardown_socket()
 
 def main(args=[]):
@@ -103,6 +107,11 @@ def main(args=[]):
     elif args[1] == 'set':
       if len(args) > 3:
         set(args[2], args[3])
+    elif args[1] == 'append':
+      if os.path.exists(socketfile):
+        command(['loadfile', args[2], 'append'], json=True)
+      else:
+        play(args[2])
 
 if __name__ == '__main__':
   main(sys.argv)

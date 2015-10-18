@@ -37,5 +37,8 @@ class mpv_control():
   def set(self, property, value):
     return self.mpv_command(''.join([json.dumps({'command': ['set_property_string', property, value]}), '\n']))
 
+  def json_command(self, command):
+    return self.mpv_command(''.join([json.dumps({'command': command}), '\n']))
+
   def command(self, com):
     self.mpv_command(com + '\n')
