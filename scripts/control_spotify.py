@@ -11,7 +11,7 @@ def control_spotify(command):
   spotify = session.get_object(
     "org.mpris.MediaPlayer2.spotify",
     "/org/mpris/MediaPlayer2")
-  getattr(spotify, command)()
+  getattr(spotify, command)(dbus_interface='org.mpris.MediaPlayer2.Player')
 
 if __name__ == '__main__':
   if len(sys.argv) > 1:
