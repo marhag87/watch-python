@@ -42,7 +42,17 @@ def generate_play_command(name, idle=False, mute=False, video=True):
           '--input-unix-socket', socketfile,
           name]
 
+def get_actual_file(file):
+  if os.path.isdir(file):
+    for file_in_dir in os.listdir(file):
+        if file_in_dir.endswith(".rar"):
+          file += '/' + file_in_dir
+          return file
+  else:
+    return file
+
 def play(file, idle=False, mute=False, video=True, pause_spotify=True):
+  file = get_actual_file(file)
   if os.path.isfile(file) or file.startswith('http'):
     if pause_spotify:
       control_spotify('Pause')

@@ -7,7 +7,8 @@ import stat
 import time
 import mock
 
-from play import generate_play_command, create_control_file, remove_control_file, play, get, set, command, socketfile, help
+import play
+from play import generate_play_command, create_control_file, remove_control_file, get, set, command, socketfile, help
 from play import main as play_main
 from mpv import mpv_control
 
@@ -75,7 +76,7 @@ class TestPlayInterface(unittest.TestCase):
     mpv.teardown_socket()
 
   def test_can_send_commands_through_fifo(self):
-    play('https://www.youtube.com/watch?v=B1WiYtAfNoQ', mute=True, video=False, pause_spotify=False)
+    play.play('https://www.youtube.com/watch?v=B1WiYtAfNoQ', mute=True, video=False, pause_spotify=False)
     time.sleep(2)
 
     pause = get('pause')
@@ -93,6 +94,21 @@ class TestPlayInterface(unittest.TestCase):
     play_command = generate_play_command('https://www.youtube.com/watch?v=5u3iv8AT8G8')
 
     self.assertIn('https://www.youtube.com/watch?v=5u3iv8AT8G8', play_command)
+
+  @mock.patch('play.os')
+  def test_directory_should_play_rar(self, mock_os):
+    mock_os.path.isdir.return_value = True
+    mock_os.listdir.return_value = ['myfile.r00', 'myfile.rar']
+    result = play.get_actual_file('mydir')
+
+    self.assertEqual(result, 'mydir/myfile.rar')
+
+  @mock.patch('play.os')
+  def test_file_should_play_directly(self, mock_os):
+    mock_os.path.isdir.return_value = False
+    result = play.get_actual_file('myfile.mkv')
+
+    self.assertEqual(result, 'myfile.mkv')
 
 if __name__ == '__main__':
   unittest.main()
